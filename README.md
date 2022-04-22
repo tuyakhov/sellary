@@ -15,4 +15,6 @@ server based metadata (next)
 unrestricted minting
 fetching assets directly from chain
 
+test
+
 
