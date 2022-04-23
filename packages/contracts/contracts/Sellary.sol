@@ -5,6 +5,7 @@ pragma solidity ^0.8.4;
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
 import {ISuperfluid, ISuperToken, ISuperApp} from "@superfluid-finance/ethereum-contracts/contracts/interfaces/superfluid/ISuperfluid.sol";
 
@@ -21,6 +22,7 @@ struct SalaryPledge {
 }
 
 contract Sellary is ERC721, Ownable {
+    using Strings for uint256;
     using CFAv1Library for CFAv1Library.InitData;
     
     ISuperfluid private _host;
@@ -108,6 +110,66 @@ contract Sellary is ERC721, Ownable {
         nextId += 1;
     }
 
+    function metadata(uint256 tokenId) 
+        public view 
+        exists(tokenId) 
+        returns (int96 nftFlowrate, uint256 dueValue, uint256 until) {
+        (, nftFlowrate, , ) = _cfa.getFlow(
+            _acceptedToken,
+            address(this),
+            ownerOf(tokenId)
+        );
+        
+        uint256 secondsToGo = salaryPledges[tokenId].untilTs - block.timestamp;
+        dueValue = uint256(int256(nftFlowrate)) * secondsToGo;
+        until = salaryPledges[tokenId].untilTs;
+    }
+
+    function tokenURI(uint256 tokenId) public override view exists(tokenId) returns (string memory) {
+        (int96 nftFlowrate, uint256 dueValue, uint256 until) = metadata(tokenId);
+
+        uint256 decimalVal = dueValue / 10**18;
+
+        return string(
+            abi.encodePacked(
+                bytes('data:application/json;utf8,{"name":"'),
+                abi.encodePacked("Sellary #", tokenId.toString()),
+                bytes('","description":"'),
+                abi.encodePacked('salary pledge running until ', 
+                    until.toString(), 
+                    '; will yield ~', 
+                    decimalVal.toString(),
+                    bytes(' '), 
+                    bytes(_acceptedToken.symbol()), 
+                    '",'),
+                // // bytes('","external_url":"'),
+                // // getExternalUrl(tokenId),
+                bytes('"attributes": ['),
+                bytes('{"display_type": "date", "trait_type": "expires",'),
+                abi.encodePacked('"value":',until.toString(), '}]'),
+                // bytes('","image":"data:image/svg+xml;base64,'),
+                // Base64.encode(renderSVG(tokenId)),
+                bytes('"}')
+            )
+        ); 
+    }
+
+    function isSalaryClaimable(uint256 tokenId) public view returns (bool) {
+        return salaryPledges[tokenId].untilTs - block.timestamp < 0;
+    }
+
+    function claimBackSalary(uint256 tokenId) public exists(tokenId) {
+        if (!isSalaryClaimable(tokenId)) {
+            revert ("Salary not claimable yet");
+        }
+
+        if (salaryPledges[tokenId].employee != msg.sender) {
+            revert ("youre not the employee that receives this salary");
+        }
+
+        //todo might likely fail when owner hasn't approved the collection.
+        _burn(tokenId);
+    }
 
     function _beforeTokenTransfer(
         address oldReceiver,
@@ -182,75 +244,5 @@ contract Sellary is ERC721, Ownable {
             cfaV1.updateFlow(to, _acceptedToken, outFlowRate + flowRate);
         }
     }
-
-
-    // @dev owner can edit the NFT as long as it hasn't been issued (transferred out) yet
-    // @dev set flowRate to 0 to remove the flow
-    // function editNFT(uint256 tokenId, int96 flowRate) external onlyOwner exists(tokenId) {
-    //     require(flowRate >= 0, "flowRate must be positive!");
-
-    //     address receiver = ownerOf(tokenId);
-
-    //     if (flowRate == 0) {
-    //         _reduceFlow(receiver, flowRates[tokenId]);
-    //     } else {
-    //         _increaseFlow(receiver, flowRate - flowRates[tokenId]);
-    //     }
-
-    //     flowRates[tokenId] = flowRate;
-    // }
-
-
-// function burnNFT(uint256 tokenId) external onlyOwner exists(tokenId) {
-//         address receiver = ownerOf(tokenId);
-
-//         int96 rate = flowRates[tokenId];
-//         delete flowRates[tokenId];
-//         _burn(tokenId);
-//         //deletes flow to previous holder of nft & receiver of stream after it is burned
-
-//         //we will reduce flow of owner of NFT by total flow rate that was being sent to owner of this token
-//         _reduceFlow(receiver, rate);
-//     }
-
-    // Add a function that allows a token owner to split their token into two streams
-    // function splitStream(uint256 tokenId, int96 newTokenFlowRate) public {
-    //     require(
-    //         msg.sender == ownerOf(tokenId),
-    //         "can't edit someone else's stream"
-    //     );
-    //     require(
-    //         newTokenFlowRate < flowRates[tokenId],
-    //         "new flow must be less than old flow"
-    //     );
-
-    //     //reduce the flow to the receiver by the 'flowRate' in storage
-    //     flowRates[tokenId] -= newTokenFlowRate;
-    //     _reduceFlow(msg.sender, newTokenFlowRate);
-    //     // mint new token - will create new token's flow rate
-    //     _issueNFT(msg.sender, newTokenFlowRate);
-    //     // change old token's stored flowRate
-    //     //decrease by the value of newToken flow rate (which must be less than the old flow so can't be negative)
-
-    //     // create new token's stored flowRate
-    // }
-
-    // function mergeStreams(uint256 tokenId1, uint256 tokenId2) public {
-    //     require(
-    //         msg.sender == ownerOf(tokenId1),
-    //         "Can't edit someone else's stream"
-    //     );
-    //     require(
-    //         msg.sender == ownerOf(tokenId2),
-    //         "Can't edit someone else's stream"
-    //     );
-
-    //     //merge token1 into token2
-    //     //increase flowRate of token1
-    //     flowRates[tokenId1] += flowRates[tokenId2];
-    //     //delete flowRate of token 2 and burn NFT
-    //     delete flowRates[tokenId2];
-    //     _burn(tokenId2);
-    // }
 
 }
