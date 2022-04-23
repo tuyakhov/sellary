@@ -41,7 +41,7 @@ const Stream = ({ stream }: StreamProps) => {
         if (!signer || !account || !provider) throw "not connected";
 
         const sellary = SellaryFactory.connect(process.env.NEXT_PUBLIC_SF_SELLARY as string, signer);
-        const dueOn = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 14;
+        const dueOn = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * daysRemaining;
         
         const tx = await sellary.issueSalaryNFT(account, dueOn);
         const res = await tx.wait();
