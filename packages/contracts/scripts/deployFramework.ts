@@ -53,15 +53,6 @@ async function main() {
   const daix = await sf.loadSuperToken("fDAIx");
   const daiAddress = daix.underlyingToken.address;
   const dai = new ethers.Contract(daiAddress, daiABI, accounts[0]);
-  const SellaryFactory = await ethers.getContractFactory(
-    "Sellary",
-    accounts[0]
-  );
-
-  const sellary = await SellaryFactory.deploy(
-    sf.settings.config.hostAddress,
-    daix.address
-  );
 
   const addrs = {
     dai: daiAddress,
@@ -69,7 +60,6 @@ async function main() {
     superSigner: await superSigner.getAddress(),
     host: sf.host.hostContract.address,
     cfa: sf.cfaV1.options.config.cfaV1Address,
-    sellary: sellary.address,
     resolver: process.env.RESOLVER_ADDRESS,
   };
 

@@ -1,17 +1,14 @@
 import { Framework } from "@superfluid-finance/sdk-core";
 import dotenv from "dotenv-flow";
 import { ethers } from "hardhat";
-import { Sellary__factory } from "../typechain/factories/Sellary__factory";
 
 dotenv.config();
 
 let employer;
-let employee;
 
 async function main() {
   const accounts = await ethers.getSigners();
   employer = accounts[17];
-  employee = accounts[18];
 
   const sf = await Framework.create({
     networkName: "custom",
@@ -37,26 +34,9 @@ async function main() {
     superToken: daix.address,
     // userData?: string
   });
-  await createFlowOperation.exec(employer);
 
-  const Sellary = Sellary__factory.connect(
-    process.env.SF_SELLARY as string,
-    employer
-  );
-
-  await Sellary.streamSalary(
-    await employee.getAddress(),
-    flowrateWei.toString()
-  );
-
-  const info = await sf.cfaV1.getFlow({
-    superToken: daix.address,
-    sender: process.env.SF_SELLARY as string,
-    receiver: await employee.getAddress(),
-    providerOrSigner: employee,
-  });
-
-  console.log("streaming salary to employee", info);
+  const result = await createFlowOperation.exec(employer);
+  console.log(`started streaming to super app: `, result);
 }
 
 main().catch((error) => {
