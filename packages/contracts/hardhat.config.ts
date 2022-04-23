@@ -31,6 +31,9 @@ const config: HardhatUserConfig = {
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
+    kovan: {
+      url: 'https://kovan.infura.io/v3/97e576f1ab4d4d32bda7375d9b71205f'
+    },
     ganache_rinkeby: {
       url: "http://localhost:8545",
     },

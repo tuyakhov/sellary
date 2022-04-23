@@ -5,7 +5,6 @@ import React, {useCallback, useEffect, useMemo, useState} from "react";
 import {Account} from "../components/Account";
 import Stream from "../components/Stream";
 import {useWeb3} from "../components/Web3Context";
-import {Token as TokenContract, Token__factory as TokenFactory} from '@token/contracts';
 import {BigNumberish} from 'ethers'
 import {Framework, SuperToken, IStream} from "@superfluid-finance/sdk-core";
 import {DragHandleIcon} from "@chakra-ui/icons";
