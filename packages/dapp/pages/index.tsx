@@ -40,11 +40,11 @@ const Home: NextPage = () => {
     }, [sf, account]);
 
     return (
-        <Container maxW="container.xl" p="2" h="100vh">
+        <Box p="5">
             <Head>
                 <title>Your Superfluidstreams</title>
             </Head>
-            <Flex justify="space-between" align="center" my={12}>
+            <Flex justify="space-between" align="center" mb={12}>
                 <Heading>Sellary</Heading>
                 <Account/>
             </Flex>
@@ -71,14 +71,14 @@ const Home: NextPage = () => {
                 )
                 :
                 (
-                    <SimpleGrid columns={[1, 2, 3, 4]} spacing={10}>
-                        {streams.map((t) => (
-                            <Stream key={t.id} stream={t} nextTokenId={nextTokenId}/>
-                        ))}
-                    </SimpleGrid>
+                  <SimpleGrid columns={[1, 2]} spacing={10}>
+                      {streams.map((t) => (
+                          <Stream key={t.id} stream={t} nextTokenId={nextTokenId}/>
+                      ))}
+                  </SimpleGrid>
                 )
             }
-        </Container>
+        </Box>
     );
 };
 
