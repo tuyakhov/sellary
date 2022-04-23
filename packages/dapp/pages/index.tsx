@@ -1,14 +1,12 @@
 import {Box, Button, Center, Container, Flex, Heading, Image, Link, SimpleGrid, Text} from "@chakra-ui/react";
 import type {NextPage} from "next";
 import Head from "next/head";
-import React, {useCallback, useEffect, useMemo, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Account} from "../components/Account";
 import Stream from "../components/Stream";
 import {useWeb3} from "../components/Web3Context";
-import {Token as TokenContract, Token__factory as TokenFactory} from '@token/contracts';
-import {BigNumberish} from 'ethers'
 import {Framework, SuperToken, IStream} from "@superfluid-finance/sdk-core";
-import {DragHandleIcon} from "@chakra-ui/icons";
+import ContentBox from "../components/ContentBox";
 
 const Home: NextPage = () => {
     const [nextTokenId, setNextTokenId] = useState<string>();
@@ -40,35 +38,16 @@ const Home: NextPage = () => {
     }, [sf, account]);
 
     return (
-        <Box p="5">
+        <Container maxW="container.xl" p="2" h="100vh">
             <Head>
-                <title>Your Superfluidstreams</title>
+                <title>Sell your salary!</title>
             </Head>
             <Flex justify="space-between" align="center" mb={12}>
                 <Heading>Sellary</Heading>
                 <Account/>
             </Flex>
-            {!account || streams.length === 0 ?
-                (
-                    <Center display='flex' flexDirection={"column"} bg='RGBA(255, 255, 255, 0.48)' borderWidth='1px'
-                            p={20}
-                            borderRadius='lg' overflow='hidden'>
-                        <DragHandleIcon w={8} h={8}/>
-                        <Text m={10} fontSize='2xl'>
-                            Your active streams will appear here.
-                        </Text>
-                        {!account ?
-                            <Button onClick={() => connect()}>Connect Wallet</Button>
-                            :
-                            streams.length === 0 ?
-                                <Button>
-                                    <Link href="https://app.superfluid.finance/" isExternal>
-                                        Check out Superfluid!
-                                    </Link>
-                                </Button>
-                                : ""}
-                    </Center>
-                )
+            {!sf || streams.length === 0 ?
+                    <ContentBox streams={streams}/>
                 :
                 (
                   <SimpleGrid columns={[1, 2]} spacing={10}>
@@ -78,7 +57,7 @@ const Home: NextPage = () => {
                   </SimpleGrid>
                 )
             }
-        </Box>
+        </Container>
     );
 };
 
