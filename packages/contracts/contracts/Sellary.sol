@@ -149,7 +149,7 @@ contract Sellary is ERC721, Ownable {
                 bytes('{"display_type": "date", "trait_type": "expires",'),
                 abi.encodePacked('"value":',until.toString(), '}]'),
                 // bytes('","image":"data:image/svg+xml;base64,'),
-                // Base64.encode(renderSVG(tokenId)),
+                //Base64.encode(renderSVG(tokenId)),
                 bytes('"}')
             )
         ); 
@@ -157,6 +157,7 @@ contract Sellary is ERC721, Ownable {
 
     function renderSVG(uint256 tokenId) public pure returns (bytes memory svg) {
         (int96 nftFlowrate, uint256 dueValue, uint256 until) = metadata(tokenId);
+        uint96 _nftFlowrate = uint96(nftFlowrate);
 
         return abi.encodePacked('<svg width="600" height="600" xmlns="http://www.w3.org/2000/svg">',
             '<defs><linearGradient id="gradient-fill" x1="0" y1="0" x2="800" y2="0" gradientUnits="userSpaceOnUse">',
@@ -168,7 +169,7 @@ contract Sellary is ERC721, Ownable {
             'width="600" fill="url(#gradient-fill)"/> <text text-anchor="start" font-size="30" x="28" y="60" ',
             'font-family="Arial" text-anchor="middle" fill="black"> Flowrate </text> <text text-anchor="start" ',
             'font-size="50" x="28" y="120" font-family="Arial" text-anchor="middle" fill="white"> ',
-            '',nftFlowrate.toString(),' DAIx/s </text> <text text-anchor="start" font-size="30" x="28" y="200" font-family="Arial" ',
+            '',_nftFlowrate.toString(),' DAIx/s </text> <text text-anchor="start" font-size="30" x="28" y="200" font-family="Arial" ',
             'text-anchor="middle" fill="black"> Yield </text> <text text-anchor="start" font-size="50" x="28" y="260" ',
             'font-family="Arial" text-anchor="middle" fill="white"> ',dueValue.toString(),' DAI </text> <text text-anchor="start" ',
             'font-size="30" x="28" y="340" font-family="Arial" text-anchor="middle" fill="black"> Expiry Date </text> ',
