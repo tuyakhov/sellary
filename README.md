@@ -1,4 +1,7 @@
-# an opinionated scaffold for web3 hackathon projects
+# Sellary
+Sellary enables DAO contributors to borrow funds against their incoming money stream.
+
+### Tech:
 
 typescript  
 pnpm monorepo with two packages   
