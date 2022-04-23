@@ -42,15 +42,15 @@ const Home: NextPage = () => {
             <Head>
                 <title>Sell your salary!</title>
             </Head>
-            <Flex justify="space-between" align="center" mb={12}>
-                <Heading>Sellary</Heading>
+            <Flex justify="space-between" align="center" mb={12} mt={4}>
+                <Heading textDecoration="underline">Sellary</Heading>
                 <Account/>
             </Flex>
             {!sf || streams.length === 0 ?
-                    <ContentBox streams={streams}/>
+                    <ContentBox streams={streams} sf={sf}/>
                 :
                 (
-                  <SimpleGrid columns={[1, 2]} spacing={10}>
+                  <SimpleGrid columns={[1, 2, 3]} spacing={10}>
                       {streams.map((t) => (
                           <Stream key={t.id} stream={t} nextTokenId={nextTokenId}/>
                       ))}
