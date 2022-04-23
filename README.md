@@ -1,4 +1,4 @@
-# Sellary
+# 💸 Sellary
 Sellary enables DAO contributors to borrow funds against their incoming money stream.
 
 ### Tech:
