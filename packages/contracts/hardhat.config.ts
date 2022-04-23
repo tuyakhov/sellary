@@ -32,10 +32,11 @@ const config: HardhatUserConfig = {
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
     kovan: {
-      url: 'https://kovan.infura.io/v3/97e576f1ab4d4d32bda7375d9b71205f'
+      url: `https://kovan.infura.io/v3/${process.env.INFURA_KEY}`,
     },
-    ganache_rinkeby: {
-      url: "http://localhost:8545",
+    rinkeby: {
+      url: `https://rinkeby.infura.io/v3/${process.env.INFURA_KEY}`,
+      accounts: [process.env.DEPLOYER_PRIVATEKEY as string],
     },
   },
   gasReporter: {

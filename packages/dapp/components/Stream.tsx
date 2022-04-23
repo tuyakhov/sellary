@@ -27,15 +27,15 @@ const Stream = ({ stream }: StreamProps) => {
     const { provider, account, signer } = useWeb3();
 
     useEffect(() => {
+        if (!account || !provider) return;
         (async () => {
-            const sellary = SellaryFactory.connect(process.env.NEXT_PUBLIC_SF_SELLARY as string, provider!)
-            const balance = await sellary.balanceOf(account as string)
-            console.log(`Nft balance: ${balance.toString()}`)
+            const sellary = SellaryFactory.connect(process.env.NEXT_PUBLIC_SF_SELLARY as string, provider)
+            const balance = await sellary.balanceOf(account)
             if (balance.toNumber() > 0) {
                 setHasMinted(true)
             }
         })()
-    })
+    }, [provider, account])
 
     const sell = async () => {
         if (!signer || !account || !provider) throw "not connected";

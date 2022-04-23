@@ -41,8 +41,9 @@ contract Sellary is ERC721, Ownable {
     constructor(
         ISuperfluid host,
         IConstantFlowAgreementV1 cfa,
-        ISuperToken acceptedToken
-    ) ERC721("Sellary", "SLRY") {
+        ISuperToken acceptedToken,
+        string memory name_
+    ) ERC721(name_, "SLRY") {
         _host = host;
         _cfa = cfa;
         _acceptedToken = acceptedToken;

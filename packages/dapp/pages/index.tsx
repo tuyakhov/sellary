@@ -32,7 +32,10 @@ const Home: NextPage = () => {
     useEffect(() => {
         if (!sf || !account) return;
         (async () => {
-          const _streams = await sf.query.listStreams({receiver: account, sender: process.env.NEXT_PUBLIC_SF_SELLARY});
+          const _streams = await sf.query
+            .listStreams({receiver: account, sender: process.env.NEXT_PUBLIC_SF_SELLARY});
+        
+            console.log(_streams);
             setStreams(_streams.data);
         })();
     }, [sf, account]);

@@ -21,7 +21,7 @@ async function main() {
     protocolReleaseVersion: "test",
   });
 
-  const monthlySalary = ethers.utils.parseEther("2");
+  const monthlySalary = ethers.utils.parseEther("2000");
   const flowrateWei = monthlySalary.div(30).div(24).div(60).div(60);
   console.log(
     "Streaming 2 Eth over the duration of 1 month with a flowrate of: ",
