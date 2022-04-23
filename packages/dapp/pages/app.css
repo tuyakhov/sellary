@@ -1,0 +1,15 @@
+@font-face {
+    font-family: 'Moderna Sans Medium Ext';
+    src: local('Moderna Sans Medium Ext'), local('ModernaSans-MediumExt'),
+    url('../asset/fonts/ModernaSans-MediumExt.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Roboto Regular';
+    src: local('Roboto Regular'), local('Roboto-Regular'),
+    url('../asset/fonts/Roboto-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
