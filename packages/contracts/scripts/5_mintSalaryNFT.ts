@@ -7,6 +7,7 @@ import { TransferEvent } from "../typechain/Sellary";
 dotenv.config();
 
 let employee;
+let buyer;
 
 async function main() {
   const accounts = await ethers.getSigners();
