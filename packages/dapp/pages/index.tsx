@@ -32,8 +32,6 @@ const Home: NextPage = () => {
     }, [provider, chainId]);
 
     useEffect(() => {
-        console.log(sf);
-        console.log(account);
         if (!sf || !account) return;
         (async () => {
             const _streams = await sf.query.listStreams({receiver: account});

@@ -31,7 +31,7 @@ const Stream = ({ stream, nextTokenId }: StreamProps) => {
             </Box>
             <Progress colorScheme='teal' size='xs' isIndeterminate />
 
-            <Box p='6'>
+            <Box p='6' bg='RGBA(255, 255, 255, 0.78)'>
                 <Box
                     color='gray.500'
                     fontWeight='semibold'
