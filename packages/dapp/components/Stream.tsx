@@ -1,11 +1,11 @@
-import React, {useEffect, useState} from "react"
-import {Box, Badge, Text, Progress, InputGroup, Button, InputLeftElement, Input, InputRightAddon} from "@chakra-ui/react"
 import { ExternalLinkIcon } from '@chakra-ui/icons'
+import { Badge, Box, Button, Input, InputGroup, InputRightAddon, Progress, Text } from "@chakra-ui/react"
 import { IStream } from "@superfluid-finance/sdk-core"
 import { Sellary__factory as SellaryFactory } from '@token/contracts'
-
+import React, { useEffect, useState } from "react"
 import StreamFlow from './StreamFlow'
 import { useWeb3 } from "./Web3Context"
+
 
 interface StreamProps {
     stream: IStream,
@@ -34,11 +34,16 @@ const Stream = ({ stream }: StreamProps) => {
     })
 
     const sell = async () => {
-        console.log(1)
-        const sellary = SellaryFactory.connect(process.env.NEXT_PUBLIC_SF_SELLARY as string, signer)
-        const tx = await sellary.issueSalaryNFT(account, Math.floor(Date.now() / 1000) + 60 * 60)
-        console.log(tx)
-        console.log(await tx.wait())
+        if (!signer || !account || !provider) throw "not connected";
+
+        const sellary = SellaryFactory.connect(process.env.NEXT_PUBLIC_SF_SELLARY as string, signer);
+        const dueOn = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 14;
+        
+        const tx = await sellary.issueSalaryNFT(account, dueOn);
+        const res = await tx.wait();
+        
+        console.log(tx, res)
+        
     }
 
     return (

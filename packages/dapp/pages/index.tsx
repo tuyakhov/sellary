@@ -1,13 +1,12 @@
-import {Box, Button, Center, Container, Flex, Heading, Image, Link, SimpleGrid, Text} from "@chakra-ui/react";
-import type {NextPage} from "next";
+import { DragHandleIcon } from "@chakra-ui/icons";
+import { Box, Button, Center, Flex, Heading, Link, SimpleGrid, Text } from "@chakra-ui/react";
+import { Framework, IStream, SuperToken } from "@superfluid-finance/sdk-core";
+import type { NextPage } from "next";
 import Head from "next/head";
-import React, {useCallback, useEffect, useMemo, useState} from "react";
-import {Account} from "../components/Account";
+import React, { useEffect, useState } from "react";
+import { Account } from "../components/Account";
 import Stream from "../components/Stream";
-import {useWeb3} from "../components/Web3Context";
-import {BigNumberish} from 'ethers'
-import {Framework, SuperToken, IStream} from "@superfluid-finance/sdk-core";
-import {DragHandleIcon} from "@chakra-ui/icons";
+import { useWeb3 } from "../components/Web3Context";
 
 const Home: NextPage = () => {
     const [nextTokenId, setNextTokenId] = useState<string>();
