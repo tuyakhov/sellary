@@ -8,3 +8,4 @@ dist
 #Hardhat files
 cache
 artifacts
+.env.local
