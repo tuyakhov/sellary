@@ -57,7 +57,7 @@ const Stream = ({ stream }: StreamProps) => {
                     <StreamFlow stream={stream} />
                 </Box>
             </Box>
-            (!hasMinted && <Progress colorScheme='teal' size='xs' isIndeterminate />)
+            {!hasMinted && <Progress colorScheme='teal' size='xs' isIndeterminate />}
 
             <Box p='6' bg='RGBA(255, 255, 255, 0.78)'>
                 <Box
