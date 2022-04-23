@@ -1,8 +1,9 @@
-import * as dotenv from "dotenv";
+import dotenv from "dotenv-flow";
 
 import { HardhatUserConfig, task } from "hardhat/config";
 import "@nomiclabs/hardhat-etherscan";
 import "@nomiclabs/hardhat-waffle";
+import "@nomiclabs/hardhat-web3";
 import "@typechain/hardhat";
 import "hardhat-gas-reporter";
 import "solidity-coverage";
@@ -29,6 +30,12 @@ const config: HardhatUserConfig = {
       url: process.env.ROPSTEN_URL || "",
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    },
+    kovan: {
+      url: 'https://kovan.infura.io/v3/97e576f1ab4d4d32bda7375d9b71205f'
+    },
+    ganache_rinkeby: {
+      url: "http://localhost:8545",
     },
   },
   gasReporter: {

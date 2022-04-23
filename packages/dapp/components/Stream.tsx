@@ -1,12 +1,14 @@
-import React, {useEffect, useState} from "react"
-import {Box, Badge, Text, Progress, InputGroup, Button, InputLeftElement, Input, InputRightAddon} from "@chakra-ui/react"
 import { ExternalLinkIcon } from '@chakra-ui/icons'
+import { Badge, Box, Button, Input, InputGroup, InputRightAddon, Progress, Text } from "@chakra-ui/react"
 import { IStream } from "@superfluid-finance/sdk-core"
+import { Sellary__factory as SellaryFactory } from '@token/contracts'
+import React, { useEffect, useState } from "react"
 import StreamFlow from './StreamFlow'
+import { useWeb3 } from "./Web3Context"
+
 
 interface StreamProps {
     stream: IStream,
-    nextTokenId: string | undefined
 }
 
 const streamUrl = (tnxHash: string): string => (
@@ -17,10 +19,32 @@ const shortenAdress = (str: string, len: number = 4): string => (
     `${str.slice(0, len)}...${str.slice(len * -1)}`
 )
 
-const Stream = ({ stream, nextTokenId }: StreamProps) => {
+const Stream = ({ stream }: StreamProps) => {
     const [amount, setAmount] = useState(0)
     const tnxHash = stream.flowUpdatedEvents && stream.flowUpdatedEvents[0].transactionHash
     const daysRemaining = (amount / (+stream.currentFlowRate / 1e18)) / (3600 * 24)
+    const { provider, account, signer } = useWeb3();
+
+    useEffect(() => {
+        (async () => {
+            const sellary = SellaryFactory.connect(process.env.NEXT_PUBLIC_SF_SELLARY as string, provider)
+            const balance = await sellary.balanceOf(account)
+            console.log(balance.toString())
+        })()
+    })
+
+    const sell = async () => {
+        if (!signer || !account || !provider) throw "not connected";
+
+        const sellary = SellaryFactory.connect(process.env.NEXT_PUBLIC_SF_SELLARY as string, signer);
+        const dueOn = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 14;
+        
+        const tx = await sellary.issueSalaryNFT(account, dueOn);
+        const res = await tx.wait();
+        
+        console.log(tx, res)
+        
+    }
 
     return (
         <Box maxW='sm' borderWidth='1px' borderRadius='lg' overflow='hidden'>
@@ -74,7 +98,7 @@ const Stream = ({ stream, nextTokenId }: StreamProps) => {
                         </Text>
                     ) : ''}
                 </Box>
-                <Button colorScheme='teal' width='100%' onClick={() => {}} disabled={!amount}>Sell</Button>
+                <Button colorScheme='teal' width='100%' onClick={sell}>Sell</Button>
             </Box>
         </Box>
     )
