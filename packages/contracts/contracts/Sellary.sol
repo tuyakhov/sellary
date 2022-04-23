@@ -15,10 +15,6 @@ import "hardhat/console.sol";
 
 // receives salaries by DAO
 
-struct EmployeeSalary {
-    int96 flowRate;
-}
-
 struct SalaryPledge {
     address employee;
     uint256 untilTs; 
@@ -35,7 +31,7 @@ contract Sellary is ERC721, Ownable {
 
     event NFTIssued(uint256 tokenId, address receiver, int96 flowRate);
 
-    mapping(address => EmployeeSalary) public salaries;
+    mapping(address => int96) public salaryFlowrates;
     mapping(uint256 => SalaryPledge) public salaryPledges;
 
     uint256 public nextId; 
@@ -72,41 +68,41 @@ contract Sellary is ERC721, Ownable {
         _;
     }
 
-    function streamSalary(address receiver, int96 flowRate_) external  {
+    function streamSalary(address receiver, int96 flowRate_) public  {
         //check that stream doesnt exist
         //check that no NFT is out there.
         cfaV1.createFlow(receiver, _acceptedToken, flowRate_);
-        salaries[receiver] = EmployeeSalary({
-            flowRate: flowRate_
-        });
+        salaryFlowrates[receiver] = flowRate_;
     } 
 
-    // @dev call this as an employee
-    function issueSalaryNFT(uint256 until, address receiver) external {
+    // @dev todo only callable by employees
+    function issueSalaryNFT(address receiver, uint256 until) external {
         (, int96 oldOutFlowRate, , ) = _cfa.getFlow(
             _acceptedToken,
             address(this),
             msg.sender
         );
-        //theres an active stream to this recipient
+        //todo: ensure that the outflow is not part of an active pledge
+
+        //there's an active stream to this recipient
         if (oldOutFlowRate > 0) {
             console.logInt(oldOutFlowRate);
+            //cancel our current salary stream
             cfaV1.deleteFlow(address(this), msg.sender, _acceptedToken);
-
-            _issueNFT(msg.sender, oldOutFlowRate, until);
+            _issueNFT(msg.sender, receiver, oldOutFlowRate, until);
         } else {
             revert("not getting a salary");
         }
     }
 
+            
     //use the common or predefined flow rate _acceptedToken
-    function _issueNFT(address receiver, int96 flowRate, uint256 untilTs_) internal {
+    function _issueNFT(address employee_, address receiver, int96 flowRate, uint256 untilTs_) internal {
         require(flowRate > 0, "flowRate must be positive!");
         salaryPledges[nextId] = SalaryPledge({
-            employee: receiver,
+            employee: employee_,
             untilTs: untilTs_
         });
-
         //emit NFTIssued(nextId, receiver, flowRates[nextId]);
         _mint(receiver, nextId);
         nextId += 1;
@@ -132,10 +128,15 @@ contract Sellary is ERC721, Ownable {
         );
 
         if (oldOutFlowRate > 0) {
-            cfaV1.deleteFlow(address(this), msg.sender, _acceptedToken);
+            cfaV1.deleteFlow(address(this),oldReceiver, _acceptedToken);
         }
-        cfaV1.createFlow(newReceiver, _acceptedToken, oldOutFlowRate);
-        
+        if (newReceiver == address(0)) {
+            //burnt
+            //setup old stream flow
+            streamSalary(salaryPledges[tokenId].employee,oldOutFlowRate);
+        } else {
+            cfaV1.createFlow(newReceiver, _acceptedToken, oldOutFlowRate);
+        }
     }   
 
 
