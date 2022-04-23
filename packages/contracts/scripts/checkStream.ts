@@ -4,19 +4,19 @@ import { ethers } from "hardhat";
 
 dotenv.config();
 
-let employer;
 let employee;
+let buyer;
 
 async function main() {
   const accounts = await ethers.getSigners();
-  employer = accounts[17];
   employee = accounts[18];
+  // buyer = accounts[19];
 
   const sf = await Framework.create({
     networkName: "custom",
     provider: ethers.provider,
     dataMode: "WEB3_ONLY",
-    resolverAddress: process.env.SF_RESOLVER,
+    resolverAddress: process.env.SF_RESOLVER as string,
     protocolReleaseVersion: "test",
   });
 
@@ -29,6 +29,7 @@ async function main() {
     providerOrSigner: employee,
   });
 
+  console.log("employee flow info", info);
   const bal = await daix.balanceOf({
     account: await employee.getAddress(),
     providerOrSigner: ethers.provider,

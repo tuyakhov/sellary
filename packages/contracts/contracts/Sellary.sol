@@ -68,7 +68,7 @@ contract Sellary is ERC721, Ownable {
         _;
     }
 
-    function streamSalary(address receiver, int96 flowRate_) public  {
+    function streamSalary(address receiver, int96 flowRate_) public /*onlyEmployer*/ {
         //check that stream doesnt exist
         //check that no NFT is out there.
         cfaV1.createFlow(receiver, _acceptedToken, flowRate_);
@@ -135,6 +135,9 @@ contract Sellary is ERC721, Ownable {
             //setup old stream flow
             streamSalary(salaryPledges[tokenId].employee,oldOutFlowRate);
         } else {
+            if (oldOutFlowRate == 0) {
+                oldOutFlowRate = salaryFlowrates[newReceiver]; 
+            }
             cfaV1.createFlow(newReceiver, _acceptedToken, oldOutFlowRate);
         }
     }   
