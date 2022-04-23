@@ -155,6 +155,28 @@ contract Sellary is ERC721, Ownable {
         ); 
     }
 
+    function renderSVG(uint256 tokenId) public pure returns (bytes memory svg) {
+        (int96 nftFlowrate, uint256 dueValue, uint256 until) = metadata(tokenId);
+
+        return abi.encodePacked('<svg width="600" height="600" xmlns="http://www.w3.org/2000/svg">',
+            '<defs><linearGradient id="gradient-fill" x1="0" y1="0" x2="800" y2="0" gradientUnits="userSpaceOnUse">',
+            '<stop offset="0" stop-color="#0a515c" /> <stop offset="0.125" stop-color="#005f68"/>',
+            '<stop offset="0.25" stop-color="#006d70" /> <stop offset="0.375" stop-color="#007b73" />',
+            '<stop offset="0.5" stop-color="#008971" /> <stop offset="0.625" stop-color="#009669" /> ',
+            '<stop offset="0.75" stop-color="#00a35d" /> <stop offset="0.875" stop-color="#00af4c" /> ',
+            '<stop offset="1" stop-color="#12bb33" /> </linearGradient> </defs> <rect x="0" y="0" height="600" ',
+            'width="600" fill="url(#gradient-fill)"/> <text text-anchor="start" font-size="30" x="28" y="60" ',
+            'font-family="Arial" text-anchor="middle" fill="black"> Flowrate </text> <text text-anchor="start" ',
+            'font-size="50" x="28" y="120" font-family="Arial" text-anchor="middle" fill="white"> ',
+            '',nftFlowrate.toString(),' DAIx/s </text> <text text-anchor="start" font-size="30" x="28" y="200" font-family="Arial" ',
+            'text-anchor="middle" fill="black"> Yield </text> <text text-anchor="start" font-size="50" x="28" y="260" ',
+            'font-family="Arial" text-anchor="middle" fill="white"> ',dueValue.toString(),' DAI </text> <text text-anchor="start" ',
+            'font-size="30" x="28" y="340" font-family="Arial" text-anchor="middle" fill="black"> Expiry Date </text> ',
+            '<text text-anchor="start" font-size="50" x="28" y="400" font-family="Arial" text-anchor="middle" ',
+            'fill="white"> ',until.toString(),' </text> </svg>');
+
+    }
+
     function isSalaryClaimable(uint256 tokenId) public view returns (bool) {
         return salaryPledges[tokenId].untilTs - block.timestamp < 0;
     }
