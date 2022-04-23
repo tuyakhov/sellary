@@ -29,12 +29,12 @@ async function main() {
     employee
   );
 
-  const nowPlusOneHour = Math.floor(Date.now() / 1000) + 60 * 60;
-
+  // const nowPlusOneHour = Math.floor(Date.now() / 1000) + 60 * 60;
+  const twoWeeks = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 14;
   // issue to ourselves
   const tx = await Sellary.issueSalaryNFT(
     await employee.getAddress(),
-    nowPlusOneHour
+    twoWeeks
   );
   const res = await tx.wait();
 
