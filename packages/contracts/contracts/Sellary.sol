@@ -5,6 +5,7 @@ pragma solidity ^0.8.4;
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
 import {ISuperfluid, ISuperToken, ISuperApp} from "@superfluid-finance/ethereum-contracts/contracts/interfaces/superfluid/ISuperfluid.sol";
 
@@ -21,6 +22,7 @@ struct SalaryPledge {
 }
 
 contract Sellary is ERC721, Ownable {
+    using Strings for uint256;
     using CFAv1Library for CFAv1Library.InitData;
     
     ISuperfluid private _host;
@@ -121,6 +123,35 @@ contract Sellary is ERC721, Ownable {
         uint256 secondsToGo = salaryPledges[tokenId].untilTs - block.timestamp;
         dueValue = uint256(int256(nftFlowrate)) * secondsToGo;
         until = salaryPledges[tokenId].untilTs;
+    }
+
+    function tokenURI(uint256 tokenId) public override view exists(tokenId) returns (string memory) {
+        (int96 nftFlowrate, uint256 dueValue, uint256 until) = metadata(tokenId);
+
+        uint256 decimalVal = dueValue / 10**18;
+
+        return string(
+            abi.encodePacked(
+                bytes('data:application/json;utf8,{"name":"'),
+                abi.encodePacked("Sellary #", tokenId.toString()),
+                bytes('","description":"'),
+                abi.encodePacked('salary pledge running until ', 
+                    until.toString(), 
+                    '; will yield ~', 
+                    decimalVal.toString(),
+                    bytes(' '), 
+                    bytes(_acceptedToken.symbol()), 
+                    '",'),
+                // // bytes('","external_url":"'),
+                // // getExternalUrl(tokenId),
+                bytes('"attributes": ['),
+                bytes('{"display_type": "date", "trait_type": "expires",'),
+                abi.encodePacked('"value":',until.toString(), '}]'),
+                // bytes('","image":"data:image/svg+xml;base64,'),
+                // Base64.encode(renderSVG(tokenId)),
+                bytes('"}')
+            )
+        ); 
     }
 
     function isSalaryClaimable(uint256 tokenId) public view returns (bool) {
