@@ -10,10 +10,12 @@ interface IWeb3Context {
   account?: string;
   chainId?: number;
   connect: () => Promise<unknown>;
+  disconnect: () => Promise<unknown>;
 }
 
 const Web3Context = React.createContext<IWeb3Context>({
   connect: () => Promise.resolve({}),
+  disconnect: () => Promise.resolve({}),
 });
 
 const useWeb3 = () => useContext(Web3Context);
@@ -40,6 +42,13 @@ const Web3Provider = ({ children }: { children: React.ReactNode }) => {
     setWeb3Modal(w3m);
   }, []);
 
+  const disconnect = async () => {
+    if (!web3Modal) return;
+
+    //TODO remove/reset context
+    await web3Modal.clearCachedProvider();
+  };
+
   const connect = useCallback(async (provider?: string) => {
     if (!web3Modal) return;
     const instance =  provider ? web3Modal.connectTo(provider) : web3Modal.connect();
@@ -54,6 +63,7 @@ const Web3Provider = ({ children }: { children: React.ReactNode }) => {
       account,
       chainId: Number(_instance.chainId),
       connect,
+      disconnect
     });
   },[web3Modal]);
 
