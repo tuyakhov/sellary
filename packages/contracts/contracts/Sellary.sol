@@ -155,9 +155,37 @@ contract Sellary is ERC721, Ownable {
         ); 
     }
 
+    uint constant SECONDS_PER_DAY = 24 * 60 * 60;
+    int constant OFFSET19700101 = 2440588;
+
+    function _daysToDate(uint _days) internal pure returns (uint year, uint month, uint day) {
+        int __days = int(_days);
+
+        int L = __days + 68569 + OFFSET19700101;
+        int N = 4 * L / 146097;
+        L = L - (146097 * N + 3) / 4;
+        int _year = 4000 * (L + 1) / 1461001;
+        L = L - 1461 * _year / 4 + 31;
+        int _month = 80 * L / 2447;
+        int _day = L - 2447 * _month / 80;
+        L = _month / 11;
+        _month = _month + 2 - 12 * L;
+        _year = 100 * (N - 49) + _year + L;
+
+        year = uint(_year);
+        month = uint(_month);
+        day = uint(_day);
+    }
+
+    function timestampToDate(uint timestamp) internal pure returns (uint year, uint month, uint day) {
+        (year, month, day) = _daysToDate(timestamp / SECONDS_PER_DAY);
+    }
+
     function renderSVG(uint256 tokenId) public pure returns (bytes memory svg) {
         (int96 nftFlowrate, uint256 dueValue, uint256 until) = metadata(tokenId);
         uint96 _nftFlowrate = uint96(nftFlowrate);
+
+        (uint untilYear, uint untilMonth, uint untilDay) = timestampToDate(until);
 
         return abi.encodePacked('<svg width="600" height="600" xmlns="http://www.w3.org/2000/svg">',
             '<defs><linearGradient id="gradient-fill" x1="0" y1="0" x2="800" y2="0" gradientUnits="userSpaceOnUse">',
@@ -174,7 +202,7 @@ contract Sellary is ERC721, Ownable {
             'font-family="Arial" text-anchor="middle" fill="white"> ',dueValue.toString(),' DAI </text> <text text-anchor="start" ',
             'font-size="30" x="28" y="340" font-family="Arial" text-anchor="middle" fill="black"> Expiry Date </text> ',
             '<text text-anchor="start" font-size="50" x="28" y="400" font-family="Arial" text-anchor="middle" ',
-            'fill="white"> ',until.toString(),' </text> </svg>');
+            'fill="white"> ',untilDay.toString(),'/',untilMonth.toString(),'/',untilYear.toString(),' </text> </svg>');
 
     }
 
