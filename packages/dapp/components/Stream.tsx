@@ -47,9 +47,8 @@ const Stream = ({ stream, nextTokenId }: StreamProps) => {
                 lineHeight='tight'
                 isTruncated
                 >
-                    {/*TODO refactor this with a bit more sleep*/}
-                    {(stream.streamedUntilUpdatedAt + ((Math.floor(Date.now() / 1000)) - stream.updatedAtTimestamp)
-                    * stream.currentFlowRate)
+                    {(+stream.streamedUntilUpdatedAt + ((Math.floor(Date.now() / 1000)) - stream.updatedAtTimestamp)
+                    * +stream.currentFlowRate)
                     / 1000000000000000000}
                 </Box>
 
