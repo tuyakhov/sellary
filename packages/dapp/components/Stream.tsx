@@ -21,15 +21,19 @@ const shortenAdress = (str: string, len: number = 4): string => (
 
 const Stream = ({ stream }: StreamProps) => {
     const [amount, setAmount] = useState(0)
+    const [hasMinted, setHasMinted] = useState(false)
     const tnxHash = stream.flowUpdatedEvents && stream.flowUpdatedEvents[0].transactionHash
     const daysRemaining = (amount / (+stream.currentFlowRate / 1e18)) / (3600 * 24)
     const { provider, account, signer } = useWeb3();
 
     useEffect(() => {
         (async () => {
-            const sellary = SellaryFactory.connect(process.env.NEXT_PUBLIC_SF_SELLARY as string, provider)
-            const balance = await sellary.balanceOf(account)
-            console.log(balance.toString())
+            const sellary = SellaryFactory.connect(process.env.NEXT_PUBLIC_SF_SELLARY as string, provider!)
+            const balance = await sellary.balanceOf(account as string)
+            console.log(`Nft balance: ${balance.toString()}`)
+            if (balance.toNumber() > 0) {
+                setHasMinted(true)
+            }
         })()
     })
 
@@ -41,9 +45,9 @@ const Stream = ({ stream }: StreamProps) => {
         
         const tx = await sellary.issueSalaryNFT(account, dueOn);
         const res = await tx.wait();
-        
         console.log(tx, res)
         
+        setHasMinted(true)
     }
 
     return (
@@ -53,7 +57,7 @@ const Stream = ({ stream }: StreamProps) => {
                     <StreamFlow stream={stream} />
                 </Box>
             </Box>
-            <Progress colorScheme='teal' size='xs' isIndeterminate />
+            (!hasMinted && <Progress colorScheme='teal' size='xs' isIndeterminate />)
 
             <Box p='6' bg='RGBA(255, 255, 255, 0.78)'>
                 <Box
@@ -87,18 +91,26 @@ const Stream = ({ stream }: StreamProps) => {
                     </Text>
                     <Text fontSize='sm'>{(new Date(stream.createdAtTimestamp * 1000)).toLocaleString()}</Text>
                 </Box>
-                <Box mb='4'>
-                    <InputGroup>
-                        <Input placeholder='Amount to sell' type='number' onChange={e => setAmount(+e.target.value)} />
-                        <InputRightAddon>{stream.token.symbol}</InputRightAddon>
-                    </InputGroup>
-                    {daysRemaining ? (
-                        <Text fontSize='sm' color='gray.800' as='i'>
-                            Inflow of {daysRemaining.toFixed(0)} days
-                        </Text>
-                    ) : ''}
-                </Box>
-                <Button colorScheme='teal' width='100%' onClick={sell}>Sell</Button>
+                {hasMinted 
+                    ?  <Text colorScheme="teal">Minted!</Text>
+                    : (
+                    <>
+                        <Box mb='4'>
+                            <InputGroup>
+                                <Input placeholder='Amount to sell' type='number' onChange={e => setAmount(+e.target.value)} />
+                                <InputRightAddon>{stream.token.symbol}</InputRightAddon>
+                            </InputGroup>
+                            {daysRemaining ? (
+                                <Text fontSize='sm' color='gray.800' as='i'>
+                                    Inflow of {daysRemaining.toFixed(0)} days
+                                </Text>
+                            ) : ''}
+                        </Box>
+                        <Button colorScheme='teal' width='100%' onClick={sell} disabled={!amount}>
+                            Sell
+                        </Button>
+                    </>
+                )}
             </Box>
         </Box>
     )

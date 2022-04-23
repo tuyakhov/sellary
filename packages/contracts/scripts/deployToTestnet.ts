@@ -2,8 +2,8 @@ import { Wallet } from ".pnpm/@ethersproject+wallet@5.6.0/node_modules/@etherspr
 import { ethers } from "hardhat";
 
 async function main() {
-  const provider = ethers.getDefaultProvider('kovan')
-  const account = new Wallet(process.env.PRIVATE_KEY, provider);
+  const provider = ethers.getDefaultProvider("kovan");
+  const account = new Wallet(process.env.PRIVATE_KEY as string, provider);
   const SellaryFactory = await ethers.getContractFactory("Sellary", account);
 
   const sellary = await SellaryFactory.deploy(

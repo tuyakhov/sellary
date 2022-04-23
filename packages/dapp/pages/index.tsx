@@ -32,7 +32,7 @@ const Home: NextPage = () => {
     useEffect(() => {
         if (!sf || !account) return;
         (async () => {
-            const _streams = await sf.query.listStreams({receiver: account});
+          const _streams = await sf.query.listStreams({receiver: account, sender: process.env.NEXT_PUBLIC_SF_SELLARY});
             setStreams(_streams.data);
         })();
     }, [sf, account]);
@@ -71,7 +71,7 @@ const Home: NextPage = () => {
                 (
                   <SimpleGrid columns={[1, 2]} spacing={10}>
                       {streams.map((t) => (
-                          <Stream key={t.id} stream={t} nextTokenId={nextTokenId}/>
+                          <Stream key={t.id} stream={t} />
                       ))}
                   </SimpleGrid>
                 )
