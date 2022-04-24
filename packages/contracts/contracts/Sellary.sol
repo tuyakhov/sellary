@@ -34,6 +34,7 @@ contract Sellary is ERC721, Ownable {
     event NFTIssued(uint256 tokenId, address receiver, int96 flowRate);
 
     mapping(address => int96) public salaryFlowrates;
+    mapping(address => uint256) public salaryToToken;
     mapping(uint256 => SalaryPledge) public salaryPledges;
 
     uint256 public nextId; 
@@ -73,29 +74,41 @@ contract Sellary is ERC721, Ownable {
 
     function streamSalary(address receiver, int96 flowRate_) public /*onlyEmployer*/ {
         //check that stream doesnt exist
+        (, int96 nftFlowrate, , ) = _cfa.getFlow(
+            _acceptedToken,
+            address(this),
+            receiver
+        );
+        if(nftFlowrate > 0) revert ("this receiver already receives a salary");
+
         //check that no NFT is out there.
+        if(salaryToToken[receiver] != 0) {
+            revert ("there is an NFT capturing this salary stream");
+        }
+
         cfaV1.createFlow(receiver, _acceptedToken, flowRate_);
         salaryFlowrates[receiver] = flowRate_;
     } 
 
-    // @dev todo only callable by employees
     function issueSalaryNFT(address receiver, uint256 until) external {
-        (, int96 oldOutFlowRate, , ) = _cfa.getFlow(
+        
+        if (salaryFlowrates[msg.sender] == 0) {
+            revert("you must receive a salary to mint an NFT");
+        }
+        (, int96 flowRate, , ) = _cfa.getFlow(
             _acceptedToken,
             address(this),
             msg.sender
         );
-        //todo: ensure that the outflow is not part of an active pledge
-
-        //there's an active stream to this recipient
-        if (oldOutFlowRate > 0) {
-            console.logInt(oldOutFlowRate);
-            //cancel our current salary stream
-            cfaV1.deleteFlow(address(this), msg.sender, _acceptedToken);
-            _issueNFT(msg.sender, receiver, oldOutFlowRate, until);
-        } else {
-            revert("not getting a salary");
+        if (flowRate == 0) {
+            revert("you must receive a salary to mint an NFT");
         }
+
+        console.logInt(flowRate);
+        //cancel our current salary stream
+        cfaV1.deleteFlow(address(this), msg.sender, _acceptedToken);
+        _issueNFT(msg.sender, receiver, flowRate, until);
+        
     }
 
             
@@ -106,10 +119,47 @@ contract Sellary is ERC721, Ownable {
             employee: employee_,
             untilTs: untilTs_
         });
-        //emit NFTIssued(nextId, receiver, flowRates[nextId]);
         _mint(receiver, nextId);
+        salaryToToken[employee_] = nextId;
         nextId += 1;
     }
+
+    function _beforeTokenTransfer(
+        address oldReceiver,
+        address newReceiver,
+        uint256 tokenId
+    ) internal override {
+        //blocks transfers to superApps - done for simplicity, but you could support super apps in a new version!
+        require(
+            !_host.isApp(ISuperApp(newReceiver)) ||
+                newReceiver == address(this),
+            "New receiver can not be a superApp"
+        );
+
+        (, int96 flowRate, , ) = _cfa.getFlow(
+            _acceptedToken,
+            address(this),
+            oldReceiver
+        );
+
+        if (flowRate > 0) {
+            cfaV1.deleteFlow(address(this),oldReceiver, _acceptedToken);
+        }
+        if (newReceiver == address(0)) {
+            //burnt
+            address employee = salaryPledges[tokenId].employee;
+            delete salaryPledges[tokenId];
+            delete salaryToToken[employee];
+
+            //setup old stream flow
+            streamSalary(employee,flowRate);
+        } else {
+            if (flowRate == 0) {
+                flowRate = salaryFlowrates[salaryPledges[tokenId].employee]; 
+            }
+            cfaV1.createFlow(newReceiver, _acceptedToken, flowRate);
+        }
+    }   
 
     function metadata(uint256 tokenId) 
         public view 
@@ -195,38 +245,7 @@ contract Sellary is ERC721, Ownable {
         _burn(tokenId);
     }
 
-    function _beforeTokenTransfer(
-        address oldReceiver,
-        address newReceiver,
-        uint256 tokenId
-    ) internal override {
-        //blocks transfers to superApps - done for simplicity, but you could support super apps in a new version!
-        require(
-            !_host.isApp(ISuperApp(newReceiver)) ||
-                newReceiver == address(this),
-            "New receiver can not be a superApp"
-        );
-
-        (, int96 oldOutFlowRate, , ) = _cfa.getFlow(
-            _acceptedToken,
-            address(this),
-            oldReceiver
-        );
-
-        if (oldOutFlowRate > 0) {
-            cfaV1.deleteFlow(address(this),oldReceiver, _acceptedToken);
-        }
-        if (newReceiver == address(0)) {
-            //burnt
-            //setup old stream flow
-            streamSalary(salaryPledges[tokenId].employee,oldOutFlowRate);
-        } else {
-            if (oldOutFlowRate == 0) {
-                oldOutFlowRate = salaryFlowrates[newReceiver]; 
-            }
-            cfaV1.createFlow(newReceiver, _acceptedToken, oldOutFlowRate);
-        }
-    }   
+    
 
 
     /**************************************************************************
