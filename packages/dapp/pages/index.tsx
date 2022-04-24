@@ -69,7 +69,7 @@ const Home: NextPage = () => {
                 )
             }
             {sf && 
-                <Flex direction="column" justify="space-between" pt={32} gridGap={4} align="flex-start">
+                <Flex direction="column" justify="space-between" mt={6} gridGap={3} align="flex-start">
                     <SellaryStats sf={sf} />
                     <Spacer />
                     <Heading size="sm">add an employee</Heading>
