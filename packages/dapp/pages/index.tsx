@@ -1,4 +1,4 @@
-import { Container, Flex, Heading, SimpleGrid } from "@chakra-ui/react";
+import { Container, Divider, Flex, Heading, SimpleGrid, Spacer } from "@chakra-ui/react";
 import { Framework, IStream, SuperToken } from "@superfluid-finance/sdk-core";
 import type { NextPage } from "next";
 import Head from "next/head";
@@ -11,11 +11,9 @@ import Stream from "../components/Stream";
 import { useWeb3 } from "../components/Web3Context";
 
 const Home: NextPage = () => {
-    const [nextTokenId, setNextTokenId] = useState<string>();
     const [sf, setFramework] = useState<Framework>();
-    const [daiXContract, setDaiXContract] = useState<SuperToken>();
     const [streams, setStreams] = useState<IStream[]>([]);
-    const {provider, signer, account, chainId, connect} = useWeb3();
+    const {provider, signer, account, chainId} = useWeb3();
 
     useEffect(() => {
         if (!provider || !chainId) return;
@@ -25,8 +23,6 @@ const Home: NextPage = () => {
                 chainId,
                 provider,
             });
-            const _daiXContract = await _sf.loadSuperToken("fDAIx");
-            setDaiXContract(_daiXContract);
             setFramework(_sf);
         })();
     }, [provider, chainId]);
@@ -39,6 +35,13 @@ const Home: NextPage = () => {
         
             console.log(_streams);
             setStreams(_streams.data);
+
+        const _outStreams = await sf.query.listStreams({
+            sender: process.env.NEXT_PUBLIC_SF_SELLARY,
+            token: "0x745861AeD1EEe363b4AaA5F1994Be40b1e05Ff90"
+        });
+        console.log(_outStreams);
+
         })();
     }, [sf, account]);
 
@@ -55,17 +58,21 @@ const Home: NextPage = () => {
             {streams.length === 0 ?
                 <ContentBox streams={streams}/>
                 :
-                (
+                (<>
+                <Heading size="md" mb={3}>Your streams</Heading>
                   <SimpleGrid columns={[1, 2, 3]} spacing={10}>
                       {streams.map((t) => (
                           <Stream key={t.id} stream={t} />
-                      ))}
+                          ))}
                   </SimpleGrid>
+                </>
                 )
             }
             {sf && 
-                <Flex direction="row" justify="space-between" my={5} align="center">
+                <Flex direction="column" justify="space-between" pt={32} gridGap={4} align="flex-start">
                     <SellaryStats sf={sf} />
+                    <Spacer />
+                    <Heading size="sm">add an employee</Heading>
                     <AddEmployee />
                 </Flex>
             }

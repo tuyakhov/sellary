@@ -10,10 +10,10 @@ const Account = () => {
       {account ? (
               <Box bg='RGBA(255, 255, 255, 0.48)' borderWidth='1px' p={2} borderRadius='lg' overflow='hidden'>
                 <Badge fontSize='1.2em'>{account.slice(0, 5) + "..." + account.slice(-4)}</Badge>
-                <Button onClick={() => disconnect()} size='sm' ml={2}>Disconnect</Button>
+                {disconnect && <Button onClick={() => disconnect()} size='sm' ml={2}>Disconnect</Button>}
               </Box>)
           :
-          <Button onClick={() => connect()}>Connect Wallet</Button>
+          <Button onClick={() => connect ? connect() : false}>Connect Wallet</Button>
       }
     </Text>
   )

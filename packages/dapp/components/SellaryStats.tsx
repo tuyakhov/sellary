@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import {Framework, SuperToken, IStream} from "@superfluid-finance/sdk-core";
 import { useWeb3 } from './Web3Context';
-import { Flex } from '@chakra-ui/react';
+import { Flex, Link, Text } from '@chakra-ui/react';
 import { ethers } from 'ethers';
 
 export const SellaryStats = ({sf}: {sf: Framework}) => {
@@ -16,11 +16,13 @@ export const SellaryStats = ({sf}: {sf: Framework}) => {
         account: process.env.NEXT_PUBLIC_SF_SELLARY as string, 
         providerOrSigner: provider
       });
-      setSellaryBalance(ethers.utils.formatEther(_sellaryBalance));
+      setSellaryBalance(parseFloat(ethers.utils.formatEther(_sellaryBalance)).toFixed(4));
     })()
   }, [sf, provider])
 
   return <Flex >
-     Sellary Contract Balance: {sellaryBalance} fDAIx
+    <Text>
+      <Link href="https://rinkeby.etherscan.io/address/0x34f395227848222a254030154e1133ecdda84b0b" isExternal>Sellary Contract</Link> Balance: <b>{sellaryBalance}</b> fDAIx
+     </Text>
   </Flex>
 } 

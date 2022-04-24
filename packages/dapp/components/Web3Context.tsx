@@ -9,8 +9,8 @@ interface IWeb3Context {
   signer?: ethers.Signer;
   account?: string;
   chainId?: number;
-  connect: () => Promise<unknown>;
-  disconnect: () => Promise<unknown>;
+  connect?: () => Promise<unknown>;
+  disconnect?: () => Promise<unknown>;
 }
 
 const Web3Context = React.createContext<IWeb3Context>({

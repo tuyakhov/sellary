@@ -21,7 +21,7 @@ const ContainerBox = ({streams}: ContainerBoxProps) => {
                 Your active streams will appear here.
             </Text>
             {!account ?
-                <Button onClick={() => connect()}>Connect Wallet</Button>
+                <Button onClick={() => connect ? connect() : false}>Connect Wallet</Button>
                 :
                 streams && streams.length === 0 ?
                     <Button>

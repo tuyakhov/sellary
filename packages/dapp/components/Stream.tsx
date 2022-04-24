@@ -20,8 +20,10 @@ const shortenAdress = (str: string, len: number = 4): string => (
 )
 
 const Stream = ({ stream }: StreamProps) => {
-    const [amount, setAmount] = useState(0)
-    const [hasMinted, setHasMinted] = useState(false)
+    const [amount, setAmount] = useState<number>(0)
+    const [hasMinted, setHasMinted] = useState<boolean>(false)
+    const [isMinting, setIsMinting] = useState<boolean>(false);
+
     const tnxHash = stream.flowUpdatedEvents && stream.flowUpdatedEvents[0].transactionHash
     const daysRemaining = (amount / (+stream.currentFlowRate / 1e18)) / (3600 * 24)
     const { provider, account, signer } = useWeb3();
@@ -37,16 +39,17 @@ const Stream = ({ stream }: StreamProps) => {
         })()
     }, [provider, account])
 
-    const sell = async () => {
+    const mint = async () => {
         if (!signer || !account || !provider) throw "not connected";
 
+        setIsMinting(true);
         const sellary = SellaryFactory.connect(process.env.NEXT_PUBLIC_SF_SELLARY as string, signer);
         const dueOn = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * daysRemaining;
         
         const tx = await sellary.issueSalaryNFT(account, dueOn);
         const res = await tx.wait();
         console.log(tx, res)
-        
+        setIsMinting(false);
         setHasMinted(true)
     }
 
@@ -57,9 +60,9 @@ const Stream = ({ stream }: StreamProps) => {
                     <StreamFlow stream={stream} />
                 </Box>
             </Box>
-            {!hasMinted && <Progress colorScheme='teal' size='xs' isIndeterminate />}
+            {isMinting && <Progress colorScheme='teal' size='xs' isIndeterminate />}
 
-            <Box p='6' bg='RGBA(255, 255, 255, 0.78)'>
+            <Box p={6} bg='RGBA(255, 255, 255, 0.78)'>
                 <Box
                     color='gray.500'
                     fontWeight='semibold'
@@ -97,7 +100,7 @@ const Stream = ({ stream }: StreamProps) => {
                     <>
                         <Box mb='4'>
                             <InputGroup>
-                                <Input placeholder='Amount to sell' type='number' onChange={e => setAmount(+e.target.value)} />
+                                <Input placeholder='Amount to mint' type='number' onChange={e => setAmount(+e.target.value)} />
                                 <InputRightAddon>{stream.token.symbol}</InputRightAddon>
                             </InputGroup>
                             {daysRemaining ? (
@@ -106,8 +109,8 @@ const Stream = ({ stream }: StreamProps) => {
                                 </Text>
                             ) : ''}
                         </Box>
-                        <Button colorScheme='teal' width='100%' onClick={sell} disabled={!amount}>
-                            Sell
+                        <Button colorScheme='teal' width='100%' onClick={mint} disabled={!amount}>
+                            Mint as NFT
                         </Button>
                     </>
                 )}
