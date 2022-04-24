@@ -26,7 +26,7 @@ const ContainerBox = ({streams}: ContainerBoxProps) => {
                 streams && streams.length === 0 ?
                     <Button>
                         <Link href="https://app.superfluid.finance/" isExternal>
-                            Check out Superfluid!
+                            Create Streams on Superfluid!
                         </Link>
                     </Button>
                     : ""}

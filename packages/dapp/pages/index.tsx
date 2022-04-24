@@ -1,12 +1,14 @@
-import {Box, Button, Center, Container, Flex, Heading, Image, Link, SimpleGrid, Text} from "@chakra-ui/react";
-import type {NextPage} from "next";
+import { Container, Flex, Heading, SimpleGrid } from "@chakra-ui/react";
+import { Framework, IStream, SuperToken } from "@superfluid-finance/sdk-core";
+import type { NextPage } from "next";
 import Head from "next/head";
-import React, {useEffect, useState} from "react";
-import {Account} from "../components/Account";
-import Stream from "../components/Stream";
-import {useWeb3} from "../components/Web3Context";
-import {Framework, SuperToken, IStream} from "@superfluid-finance/sdk-core";
+import React, { useEffect, useState } from "react";
+import { Account } from "../components/Account";
+import { AddEmployee } from "../components/AddEmployee";
 import ContentBox from "../components/ContentBox";
+import { SellaryStats } from "../components/SellaryStats";
+import Stream from "../components/Stream";
+import { useWeb3 } from "../components/Web3Context";
 
 const Home: NextPage = () => {
     const [nextTokenId, setNextTokenId] = useState<string>();
@@ -40,17 +42,18 @@ const Home: NextPage = () => {
         })();
     }, [sf, account]);
 
+
     return (
         <Container maxW="container.xl" p="2" h="100vh">
             <Head>
                 <title>Sell your salary!</title>
             </Head>
             <Flex justify="space-between" align="center" mb={12} mt={4}>
-                <Heading textDecoration="underline">Sellary</Heading>
+                <Heading textDecoration="underline" fontWeight={900}>sellary</Heading>
                 <Account/>
             </Flex>
-            {!sf || streams.length === 0 ?
-                    <ContentBox streams={streams} sf={sf}/>
+            {streams.length === 0 ?
+                <ContentBox streams={streams}/>
                 :
                 (
                   <SimpleGrid columns={[1, 2, 3]} spacing={10}>
@@ -59,6 +62,12 @@ const Home: NextPage = () => {
                       ))}
                   </SimpleGrid>
                 )
+            }
+            {sf && 
+                <Flex direction="row" justify="space-between" my={5} align="center">
+                    <SellaryStats sf={sf} />
+                    <AddEmployee />
+                </Flex>
             }
         </Container>
     );
