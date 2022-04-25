@@ -3,7 +3,7 @@ pragma solidity ^0.8.4;
 
 library StringDecimals {
 
-    function cutAtPrecision(string memory str, uint8 precision) public pure returns (string memory) {
+    function cutAtPrecision(string memory str, uint8 precision) internal pure returns (string memory) {
         bytes memory strBytes = bytes(str);
         bytes memory result = new bytes(strBytes.length);
 
@@ -33,7 +33,7 @@ library StringDecimals {
     // }
 
     // https://gist.github.com/wilsoncusack/d2e680e0f961e36393d1bf0b6faafba7
-    function decimalString(uint256 number, uint8 decimals, bool isPercent) public pure returns(string memory){
+    function decimalString(uint256 number, uint8 decimals, bool isPercent) internal pure returns(string memory){
         uint8 percentBufferOffset = isPercent ? 1 : 0;
         uint256 tenPowDecimals = 10 ** decimals;
 
