@@ -21,7 +21,7 @@ const Home: NextPage = () => {
         (async () => {
             const _sf = await Framework.create({
                 chainId,
-                provider,
+                provider
             });
             setFramework(_sf);
         })();
@@ -38,9 +38,9 @@ const Home: NextPage = () => {
 
         const _outStreams = await sf.query.listStreams({
             sender: process.env.NEXT_PUBLIC_SF_SELLARY,
-            token: "0x745861AeD1EEe363b4AaA5F1994Be40b1e05Ff90"
+            token: process.env.NEXT_PUBLIC_DAIX
         });
-        console.log(_outStreams);
+        console.log("outgoing streams: ", _outStreams);
 
         })();
     }, [sf, account]);

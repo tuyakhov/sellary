@@ -1,7 +1,7 @@
 import { Framework } from "@superfluid-finance/sdk-core";
 import dotenv from "dotenv-flow";
 import { ethers } from "hardhat";
-import { Sellary__factory } from "../typechain/factories/Sellary__factory";
+import { Sellary__factory as SellaryFactory } from "../typechain/factories/Sellary__factory";
 
 dotenv.config();
 
@@ -39,7 +39,7 @@ async function main() {
   });
   await createFlowOperation.exec(employer);
 
-  const Sellary = Sellary__factory.connect(
+  const Sellary = SellaryFactory.connect(
     process.env.SF_SELLARY as string,
     employer
   );

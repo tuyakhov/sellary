@@ -11,7 +11,7 @@ export const SellaryStats = ({sf}: {sf: Framework}) => {
   useEffect(() => {
     if (!sf || !provider) return;
     (async () => {
-      const daix = await sf.loadSuperToken("0x745861AeD1EEe363b4AaA5F1994Be40b1e05Ff90");
+      const daix = await sf.loadSuperToken("fDAIx");
       const _sellaryBalance = await daix.balanceOf({
         account: process.env.NEXT_PUBLIC_SF_SELLARY as string, 
         providerOrSigner: provider
@@ -22,7 +22,7 @@ export const SellaryStats = ({sf}: {sf: Framework}) => {
 
   return <Flex >
     <Text>
-      <Link href="https://rinkeby.etherscan.io/address/0x34f395227848222a254030154e1133ecdda84b0b" isExternal>Sellary Contract</Link> Balance: <b>{sellaryBalance}</b> fDAIx
+      <Link href={`https://rinkeby.etherscan.io/address/${process.env.NEXT_PUBLIC_SF_SELLARY}`} isExternal>Sellary Contract</Link> Balance: <b>{sellaryBalance}</b> fDAIx
      </Text>
   </Flex>
 } 

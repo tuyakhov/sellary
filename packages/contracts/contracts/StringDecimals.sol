@@ -9,6 +9,7 @@ library StringDecimals {
 
         uint decimalsCovered = 0;
         uint i = 0;
+
         while (i < strBytes.length && decimalsCovered < precision + 1) {
             bytes1 b = strBytes[i];
             if (uint8(b) == 46) {// .
@@ -21,16 +22,13 @@ library StringDecimals {
             result[i] = strBytes[i];
             i = i + 1;
         }
-        return string(result);
+        
+        bytes memory cutResult = new bytes(i);
+        for (uint j = 0; j < i; j++) {
+            cutResult[j] = result[j];
+        }
+        return string(cutResult);
     }
-
-    // function decimals(uint256 weiVal, uint8 decimals_) internal pure returns (uint32 abtissa, uint32 mantissa) {
-    //     uint256 _abtissa = weiVal / 10 ** 18;
-    //     abtissa = uint32(_abtissa);
-    //     uint256 _mantissa = weiVal - _abtissa * 10 ** 18;
-    //     _mantissa = _mantissa / 10 ** (18 - decimals_);
-    //     mantissa = uint32(_mantissa);
-    // }
 
     // https://gist.github.com/wilsoncusack/d2e680e0f961e36393d1bf0b6faafba7
     function decimalString(uint256 number, uint8 decimals, bool isPercent) internal pure returns(string memory){

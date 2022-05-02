@@ -6,6 +6,11 @@ const SF_CFA = "0xF4C5310E51F6079F601a5fb7120bC72a70b96e2A";
 const SF_TOKEN_DAIX = "0x745861AeD1EEe363b4AaA5F1994Be40b1e05Ff90";
 
 async function main() {
+  const SellaryRenderer = await ethers.getContractFactory("SellaryRenderer");
+  const sellaryRenderer = await upgrades.deployProxy(SellaryRenderer, []);
+
+  console.log("renderer: ", sellaryRenderer.address);
+
   const Sellary = await ethers.getContractFactory("Sellary");
   const sellary = await upgrades.deployProxy(Sellary, [
     SF_HOST,
