@@ -16,6 +16,7 @@ async function main() {
     SF_HOST,
     SF_CFA,
     SF_TOKEN_DAIX,
+    sellaryRenderer.address,
     "Sellary D_D",
   ]);
   await sellary.deployed();
