@@ -340,6 +340,36 @@
           }
         }
       }
+    },
+    "60c3c60e73242d995d31214ee85d6b5682591c97a3dcdcb08aeb28b3e98bf2c9": {
+      "address": "0x83b10a0868fc9c355152D6c202f89ce789Eeacb5",
+      "txHash": "0x9fcca9c4666b02a779cfa27dc1b2be73683a9a26a4cf04d8e0b258b83b54adf8",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:39"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:44"
+          }
+        ],
+        "types": {
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          }
+        }
+      }
     }
   }
 }

@@ -7,7 +7,7 @@ import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/Own
 import {ISuperfluid, ISuperToken, ISuperApp} from "@superfluid-finance/ethereum-contracts/contracts/interfaces/superfluid/ISuperfluid.sol";
 import {IConstantFlowAgreementV1} from "@superfluid-finance/ethereum-contracts/contracts/interfaces/agreements/IConstantFlowAgreementV1.sol";
 import {CFAv1Library} from "@superfluid-finance/ethereum-contracts/contracts/apps/CFAv1Library.sol";
-import "./SellaryRenderer.sol";
+import "./SellaryRendererV2.sol";
 import "hardhat/console.sol";
 
 struct SalaryPledge {
@@ -22,7 +22,7 @@ contract Sellary is ERC721Upgradeable, OwnableUpgradeable {
     ISuperfluid private _host;
     ISuperToken public _acceptedToken; // accepted token
     IConstantFlowAgreementV1 private _cfa; // the stored constant flow agreement class address
-    SellaryRenderer private _sellaryRenderer;
+    SellaryRendererV2 private _sellaryRenderer;
 
     CFAv1Library.InitData public cfaV1; //initialize cfaV1 variable
 
@@ -38,7 +38,7 @@ contract Sellary is ERC721Upgradeable, OwnableUpgradeable {
         ISuperfluid host,
         IConstantFlowAgreementV1 cfa,
         ISuperToken acceptedToken,
-        SellaryRenderer sellaryRenderer,
+        SellaryRendererV2 sellaryRenderer,
         string memory name_
     ) initializer public {
         __Ownable_init();
