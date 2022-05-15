@@ -370,6 +370,36 @@
           }
         }
       }
+    },
+    "ff35c580931cc49d682fca19981705be9c965258b8c74fe4d2d01e9d0742168d": {
+      "address": "0x05d71B0108D99317760c25A68548ECa6B79c856A",
+      "txHash": "0x9f5ec94d95d4ed951c16ed7117a3e4ea06a862223f3187b93db96c355d8e662b",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:39"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:44"
+          }
+        ],
+        "types": {
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          }
+        }
+      }
     }
   }
 }
