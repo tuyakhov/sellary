@@ -1,0 +1,15 @@
+<svg width="600" height="600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gradient-fill" x1="0" y1="0" x2="0" y2="800" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#12bb33" />
+      <stop offset="1" stop-color="#0a515c" />
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" height="600" width="600" fill="url(#gradient-fill)" /><text text-anchor="start" font-size="30"
+    x="28" y="60" font-family="Arial" fill="black"> Flowrate </text><text text-anchor="start" font-size="50" x="28"
+    y="120" font-family="Arial" fill="white">0.000192 fDAIx/s</text><text text-anchor="start" font-size="30" x="28"
+    y="200" font-family="Arial" fill="black"> Yield </text><text text-anchor="start" font-size="50" x="28" y="260"
+    font-family="Arial" fill="white">495.6849 fDAIx</text><text text-anchor="start" font-size="30" x="28" y="340"
+    font-family="Arial" fill="black"> Expiry Date (Y/M/D)</text><text text-anchor="start" font-size="50" x="28" y="400"
+    font-family="Arial" fill="white">2022/6/2</text>
+</svg>

@@ -1,35 +1,29 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-
-import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/Strings.sol";
+import {ERC721Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 import {ISuperfluid, ISuperToken, ISuperApp} from "@superfluid-finance/ethereum-contracts/contracts/interfaces/superfluid/ISuperfluid.sol";
-
 import {IConstantFlowAgreementV1} from "@superfluid-finance/ethereum-contracts/contracts/interfaces/agreements/IConstantFlowAgreementV1.sol";
-
 import {CFAv1Library} from "@superfluid-finance/ethereum-contracts/contracts/apps/CFAv1Library.sol";
-import "@openzeppelin/contracts/utils/Base64.sol";
+import "./SellaryRendererV2.sol";
 import "hardhat/console.sol";
-
-// receives salaries by DAO
 
 struct SalaryPledge {
     address employee;
     uint256 untilTs; 
 }
 
-contract Sellary is ERC721, Ownable {
-    using Strings for uint256;
+// receives salaries by DAO
+contract Sellary is ERC721Upgradeable, OwnableUpgradeable {
     using CFAv1Library for CFAv1Library.InitData;
-    
+
     ISuperfluid private _host;
     ISuperToken public _acceptedToken; // accepted token
     IConstantFlowAgreementV1 private _cfa; // the stored constant flow agreement class address
-    
+    SellaryRendererV2 private _sellaryRenderer;
+
     CFAv1Library.InitData public cfaV1; //initialize cfaV1 variable
 
     event NFTIssued(uint256 tokenId, address receiver, int96 flowRate);
@@ -40,15 +34,20 @@ contract Sellary is ERC721, Ownable {
 
     uint256 public nextId; 
 
-    constructor(
+    function initialize(
         ISuperfluid host,
         IConstantFlowAgreementV1 cfa,
         ISuperToken acceptedToken,
+        SellaryRendererV2 sellaryRenderer,
         string memory name_
-    ) ERC721(name_, "SLRY") {
+    ) initializer public {
+        __Ownable_init();
+        __ERC721_init(name_, "SLRY");
+
         _host = host;
         _cfa = cfa;
         _acceptedToken = acceptedToken;
+        _sellaryRenderer = sellaryRenderer;
 
         nextId = 1;
 
@@ -66,7 +65,7 @@ contract Sellary is ERC721, Ownable {
                 ))
             )
         );
-    }
+    } 
 
     modifier exists(uint256 tokenId) {
         require(_exists(tokenId), "token doesn't exist or has been burnt");
@@ -111,7 +110,6 @@ contract Sellary is ERC721, Ownable {
         _issueNFT(msg.sender, receiver, flowRate, until);
         
     }
-
             
     //use the common or predefined flow rate _acceptedToken
     function _issueNFT(address employee_, address receiver, int96 flowRate, uint256 untilTs_) internal {
@@ -195,53 +193,13 @@ contract Sellary is ERC721, Ownable {
     }
 
     function tokenURI(uint256 tokenId) public override view exists(tokenId) returns (string memory) {
-        (, uint256 dueValue, uint256 until) = metadata(tokenId);
-
-        uint256 decimalVal = dueValue / 10**18;
-
-        return string(
-            abi.encodePacked(
-                bytes('data:application/json;utf8,{"name":"'),
-                abi.encodePacked(bytes("Sellary "), tokenId.toString()),
-                bytes('","description":"'),
-                abi.encodePacked(bytes('salary pledge running until '), 
-                    until.toString(), 
-                    bytes('; will yield ~'), 
-                    decimalVal.toString(),
-                    bytes(' '), 
-                    bytes(_acceptedToken.symbol()), 
-                    '",'),
-                bytes('"image":"data:image/svg+xml;base64,'),
-                Base64.encode(renderSVG(tokenId)),
-                bytes('",'),
-                // // bytes('","external_url":"'),
-                // // getExternalUrl(tokenId),
-                bytes('"attributes": ['),
-                bytes('{"display_type": "date", "trait_type": "expires",'),
-                abi.encodePacked('"value":',until.toString(), '}'),
-                bytes(']}')
-            )
-        ); 
-    }
-
-    function renderSVG(uint256 tokenId) public view returns (bytes memory svg) {
         (int96 nftFlowrate, uint256 dueValue, uint256 until) = metadata(tokenId);
-        uint256 _nftFlowrate = uint256(uint96(nftFlowrate));
-
-        return abi.encodePacked('<svg width="600" height="600" xmlns="http://www.w3.org/2000/svg">',
-            '<defs><linearGradient id="gradient-fill" x1="0" y1="0" x2="800" y2="0" gradientUnits="userSpaceOnUse">',
-            '<stop offset="0" stop-color="#0a515c" /> <stop offset="0.125" stop-color="#005f68"/>',
-            '<stop offset="0.25" stop-color="#006d70" /> <stop offset="0.375" stop-color="#007b73" />',
-            '<stop offset="0.5" stop-color="#008971" /> <stop offset="0.625" stop-color="#009669" />',
-            '<stop offset="0.75" stop-color="#00a35d" /> <stop offset="0.875" stop-color="#00af4c" />', 
-            '<stop offset="1" stop-color="#12bb33" /> </linearGradient> </defs> <rect x="0" y="0" height="600" width="600" fill="url(#gradient-fill)"/>', 
-            '<text text-anchor="start" font-size="30" x="28" y="60" font-family="Arial" fill="black"> Flowrate </text>', 
-            '<text text-anchor="start" font-size="50" x="28" y="120" font-family="Arial" fill="white">', _nftFlowrate.toString(), ' DAIx/s</text>',
-            '<text text-anchor="start" font-size="30" x="28" y="200" font-family="Arial" fill="black"> Yield </text>', 
-            '<text text-anchor="start" font-size="50" x="28" y="260" font-family="Arial" fill="white">', dueValue.toString(),' DAI</text>', 
-            '<text text-anchor="start" font-size="30" x="28" y="340" font-family="Arial" fill="black"> Expiry Timestamp </text>', 
-            '<text text-anchor="start" font-size="50" x="28" y="400" font-family="Arial" fill="white">', until.toString(), '</text>',
-            '</svg>'
+        return _sellaryRenderer.metadata(
+            tokenId,
+            _acceptedToken.symbol(),
+            nftFlowrate,
+            dueValue,
+            until
         );
-    }
+    }    
 }

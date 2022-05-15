@@ -17,3 +17,6 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+
+contracts/.openzeppelin/*
+!contracts/.openzeppelin/rinkeby.json
